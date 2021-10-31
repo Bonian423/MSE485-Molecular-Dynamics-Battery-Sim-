@@ -1,30 +1,27 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Oct 30 15:26:12 2021
+Created on Sat Oct 30 19:40:48 2021
 
 @author: Bonia
 """
+# -*- coding: utf-8 -*-
+
 import numpy as np
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 
 """lattice parameters has format [x,y,z]"""
 """Unit of the lattice parameters: Angstrom"""
-lattice_params = np.array([2.93855,2.93855, 9.85993])
+lattice_params = np.array([2.46772,2.46772*np.sin(np.pi/3), 8.68504])
 
 """structure parameters has format [x,y,z]"""
 """structure parameters are formatted as ratios of lattice parameter"""
-Li_struct_param = np.array([[0.66667,    0.33333,    0.25821 ],[0.33333,    0.66667,    0.75821]])
-Co_struct_param = np.array([[0.66667,    0.33333,    0.00051 ],[0.33333,    0.66667,    0.50051]])
-O_struct_param = np.array([[0.00000,    0.00000,    0.88677],[0.00000,    0.00000,    0.38677],[0.66667,    0.33333,    0.61344],[0.33333,    0.66667,    0.11344]])
+C_struct_param = np.array([[0.00,    0.00,    0.25 ],[0.0,    0.0,    0.75],[0.66667,    0.33333,    0.25 ],[0.33333,    0.66667,    0.75]])
 
 """Atom Positions in unit cell in angstrom"""
-Li_UC_pos = np.multiply(Li_struct_param, lattice_params)
-Co_UC_pos = np.multiply(Co_struct_param, lattice_params)
-O_UC_pos = np.multiply(O_struct_param, lattice_params)
+C_UC_pos = np.multiply(C_struct_param, lattice_params)
 
-fixed_UC_pos = np.concatenate((Co_UC_pos, O_UC_pos),axis = 0)
-for atom in fixed_UC_pos:
+for atom in C_UC_pos:
     x0 = atom[0]
     y0 = atom[1]
     """this conversion is proved to be unnecessary"""
@@ -33,10 +30,7 @@ for atom in fixed_UC_pos:
 
 
 """properties of atoms at each position"""
-Li_properties_list = np.array([["G"],["G"]])
-Co_properties_list = np.array([["R"],["R"]])
-O_properties_list = np.array([["B"],["B"],["B"],["B"]])
-fixed_UC_prop = np.concatenate((Co_UC_pos, O_UC_pos),axis = 0)
+
 Li_col = np.array([0.1,0.1])
 Co_col = np.array([0.9,0.9])
 O_col = np.array([0.5,0.5,0.5,0.5])
@@ -58,38 +52,32 @@ def lattice_construction(xnum, ynum, znum):
     -------
     np.array structure with all the atoms in the constructed lattice
     """
-    xlat = fixed_UC_pos
-    xcol = fixed_UC_color
+    xlat = C_UC_pos
     for x in range(1,xnum):
         xshift = lattice_params[0]
         shift = np.array([x*xshift,0,0])
-        xlat = np.concatenate((xlat,np.add(shift, fixed_UC_pos)),axis =0)
-        xcol = np.concatenate((xcol, fixed_UC_color),axis =0)
+        xlat = np.concatenate((xlat,np.add(shift, C_UC_pos)),axis =0)
     ylat = xlat    
-    ycol = xcol
     print(xlat.shape)
     for y in range(1,ynum):
         yshift = lattice_params[1]*np.sin(np.pi/3)
         xshift = 2.93855*np.cos(np.pi/3)
         shift = np.array([y*xshift,y*yshift,0])
         ylat = np.concatenate((ylat,np.add(shift, xlat)),axis =0)
-        ycol = np.concatenate((xcol, ycol),axis =0)     
     print(ylat.shape)
     zlat = ylat
-    zcol = ycol    
     for z in range(1,znum):
         zshift = lattice_params[2]
         shift = np.array([0,0,z*zshift])
         zlat = np.concatenate((zlat,np.add(shift, ylat)),axis =0)        
-        zcol = np.concatenate((zcol, ycol),axis =0)        
     print(zlat.shape)
-    return zlat, zcol
+    return zlat
 
-a , b = lattice_construction(5, 5, 2)
-plt.figure(1)
+a = lattice_construction(5, 5, 2)
 dim = 15
+plt.figure(1)
 ax = plt.axes(projection='3d')
-ax.scatter3D(a[:,0], a[:,1], a[:,2], c = b)
+ax.scatter3D(a[:,0], a[:,1], a[:,2])
 ax.set_xlim3d(left=0, right=dim)
 ax.set_ylim3d(bottom=0, top=dim)
 ax.set_zlim3d(bottom=0, top=dim)
@@ -99,7 +87,7 @@ ax.set_ylabel("y")
 ax.set_zlabel("z")
 
 ax = plt.axes(projection='3d')
-ax.scatter3D(a[:,0], a[:,1], a[:,2], c = b)
+ax.scatter3D(a[:,0], a[:,1], a[:,2])
 ax.set_xlim3d(left=0, right=dim)
 ax.set_ylim3d(bottom=0, top=dim)
 ax.set_zlim3d(bottom=0, top=dim)
@@ -107,16 +95,7 @@ ax.view_init(90, 270)
 ax.set_xlabel("x")
 ax.set_ylabel("y")
 ax.set_zlabel("z")
-plt.figure(4)
-ax = plt.axes(projection='3d')
-ax.scatter3D(a[:,0], a[:,1], a[:,2], c = b)
-ax.set_xlim3d(left=0, right=dim)
-ax.set_ylim3d(bottom=0, top=dim)
-ax.set_zlim3d(bottom=0, top=dim)
 
-ax.set_xlabel("x")
-ax.set_ylabel("y")
-ax.set_zlabel("z")
 """Unit cell visualization"""
 # plt.figure(3)
 # bx = plt.axes(projection='3d')
