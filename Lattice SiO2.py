@@ -27,45 +27,63 @@ fixed_UC_pos = np.concatenate((Co_UC_pos, O_UC_pos),axis = 0)
 for atom in fixed_UC_pos:
     x0 = atom[0]
     y0 = atom[1]
-    """this conversion is proved to be unnecessary"""
     atom[0] = x0-y0*np.cos(np.pi/3)
     atom[1] = y0*np.sin(np.pi/3)
 
 
-"""properties of atoms at each position"""
-Li_properties_list = np.array([["G"],["G"]])
-Co_properties_list = np.array([["R"],["R"]])
-O_properties_list = np.array([["B"],["B"],["B"],["B"]])
-fixed_UC_prop = np.concatenate((Co_UC_pos, O_UC_pos),axis = 0)
+"""properties of atoms at each position
+uses array: 
+    index 0: weight, unit: gram
+    index 1: charge, unit: eV
+    index 2: 
+        
+    Unit Conversion: 1eV= 1.602*10**(-19) J
+"""
+
+Li_properties_list = np.array([[1.1526*10**(-23),1],[1.1526*10**(-23),1]])
+Co_properties_list = np.array([[9.7861*10**(-23),-1],[9.7861*10**(-23),-1]])
+O_properties_list = np.array([[2.6567*10**(-23),0],[2.6567*10**(-23),0],[2.6567*10**(-23),0],[2.6567*10**(-23),0]])
+fixed_UC_prop = np.vstack((Co_properties_list, O_properties_list))
 Li_col = np.array([0.1,0.1])
 Co_col = np.array([0.9,0.9])
 O_col = np.array([0.5,0.5,0.5,0.5])
 fixed_UC_color = np.concatenate((Co_col, O_col),axis = 0)
 
-def lattice_construction(xnum, ynum, znum):
+def lattice_construction(dim):
     """
     Construct a fixed lattice for SiO2 by defining how many unit cells we want in each dimension
 
     Parameters
     ----------
-    xnum : int, >=1
-        number of unit cells in the x direction
-    ynum : int, >=1
-        number of unit cells in the y direction
-    znum : int, >=1
-        number of unit cells in the z direction
-    Returns
+    dim: list of dimensions
+        xnum : int, >=1
+            number of unit cells in the x direction
+        ynum : int, >=1
+            number of unit cells in the y direction
+        znum : int, >=1
+            number of unit cells in the z direction
+    Returns: 
+        zlat: final lattice
+        zcol: color matrix
+        zprop: property matrix of each atom
+        * all have the same index for the same atom
     -------
     np.array structure with all the atoms in the constructed lattice
     """
+    xnum = dim[0]
+    ynum = dim[1]
+    znum = dim[2]
     xlat = fixed_UC_pos
+    xprop = fixed_UC_prop
     xcol = fixed_UC_color
     for x in range(1,xnum):
         xshift = lattice_params[0]
         shift = np.array([x*xshift,0,0])
         xlat = np.concatenate((xlat,np.add(shift, fixed_UC_pos)),axis =0)
         xcol = np.concatenate((xcol, fixed_UC_color),axis =0)
-    ylat = xlat    
+        xprop = np.vstack([xprop, fixed_UC_prop])
+    ylat = xlat
+    yprop = xprop    
     ycol = xcol
     print(xlat.shape)
     for y in range(1,ynum):
@@ -74,54 +92,58 @@ def lattice_construction(xnum, ynum, znum):
         shift = np.array([y*xshift,y*yshift,0])
         ylat = np.concatenate((ylat,np.add(shift, xlat)),axis =0)
         ycol = np.concatenate((xcol, ycol),axis =0)     
+        yprop = np.vstack([yprop, xprop])
     print(ylat.shape)
     zlat = ylat
     zcol = ycol    
+    zprop = yprop  
     for z in range(1,znum):
         zshift = lattice_params[2]
         shift = np.array([0,0,z*zshift])
         zlat = np.concatenate((zlat,np.add(shift, ylat)),axis =0)        
         zcol = np.concatenate((zcol, ycol),axis =0)        
+        zprop = np.vstack([zprop, yprop])      
     print(zlat.shape)
-    return zlat, zcol
+    return zlat, zcol, zprop
+def shift_to_center(r,dim):
+    """shift lattice to the center of the space before applying minimum image
+    ---------
+    input:
+        r: lattice
+        dim: real space dimension of the entire lattice
+    output: shifted lattice      
+    """
+    xshift = dim[0]/2
+    yshift = dim[1]/2
+    for rtemp in r:
+        rtemp[0] -= xshift
+        rtemp[1] -= yshift
+    return r
 def minimum_image(r, L):
-    PBC_pos = np.zeros([len(r),3])
+    Lx = L[0]
+    Ly = L[1]
+    Lz = L[2]
+    r[:,0] = r[:,0] - Lx*np.round(r[:,0] / Lx)
+    r[:,1] = r[:,1] - Ly*np.round(r[:,1] / Ly)
+    r[:,2] = r[:,2] - Lz*np.round(r[:,2] / Lz)
+    return r
 
-    num_i = 0
-    for i in r:
-        num_j = 0
-        for j in i:
-            if -L/2 <= j < L/2:
-                PBC_pos[num_i,num_j] = j
-            if j >= L/2:
-                j_add1 = j - (L)*(j//(L)+1)
-                if -L/2 <= j_add1 < L/2:
-                    PBC_pos[num_i,num_j] = j_add1
-                else:
-                    PBC_pos[num_i,num_j]  = j_add1 + L
-            if j < -L/2:
-                j_add1 = j - (L)*(j//(L)+1)
-                if -L/2 <= j_add1 < L/2:
-                    PBC_pos[num_i,num_j] = j_add1
-                else:
-                    PBC_pos[num_i,num_j]  = j_add1 + L    
-    
-            num_j = num_j + 1
-        num_i = num_i+1
-    
-    return PBC_pos
-    pass
 
-dim = 15
-a , b = lattice_construction(5, 6, 2)
-a = minimum_image(a, dim)
+numofcells = [6,4,2]
+adjustedlatticeparam = np.array([lattice_params[0]-lattice_params[1]*np.cos(np.pi/3),lattice_params[1]*np.sin(np.pi/3),lattice_params[2]])
+dim = np.multiply(adjustedlatticeparam,numofcells)
+
+
+a , b, prop = lattice_construction(numofcells)
+a = shift_to_center(a, dim)
+a = minimum_image(a,dim)
+
 plt.figure(1)
-dim = 15
 ax = plt.axes(projection='3d')
 ax.scatter3D(a[:,0], a[:,1], a[:,2], c = b)
-ax.set_xlim3d(left=-dim/2, right=dim/2)
-ax.set_ylim3d(bottom=-dim/2, top=dim/2)
-ax.set_zlim3d(bottom=-dim/2, top=dim/2)
+ax.set_xlim3d(left=-dim[0]/2, right=dim[0]/2)
+ax.set_ylim3d(bottom=-dim[1]/2, top=dim[1]/2)
+ax.set_zlim3d(bottom=-dim[2]/2, top=dim[2]/2)
 ax.view_init(-180, 90)
 ax.set_xlabel("x")
 ax.set_ylabel("y")
@@ -129,9 +151,9 @@ ax.set_zlabel("z")
 plt.figure(2)
 ax = plt.axes(projection='3d')
 ax.scatter3D(a[:,0], a[:,1], a[:,2], c = b)
-ax.set_xlim3d(left=-dim/2, right=dim/2)
-ax.set_ylim3d(bottom=-dim/2, top=dim/2)
-ax.set_zlim3d(bottom=-dim/2, top=dim/2)
+ax.set_xlim3d(left=-dim[0]/2, right=dim[0]/2)
+ax.set_ylim3d(bottom=-dim[1]/2, top=dim[1]/2)
+ax.set_zlim3d(bottom=-dim[2]/2, top=dim[2]/2)
 ax.view_init(90, 270)
 ax.set_xlabel("x")
 ax.set_ylabel("y")
@@ -139,13 +161,14 @@ ax.set_zlabel("z")
 plt.figure(3)
 ax = plt.axes(projection='3d')
 ax.scatter3D(a[:,0], a[:,1], a[:,2], c = b)
-ax.set_xlim3d(left=-dim/2, right=dim/2)
-ax.set_ylim3d(bottom=-dim/2, top=dim/2)
-ax.set_zlim3d(bottom=-dim/2, top=dim/2)
+ax.set_xlim3d(left=-dim[0]/2, right=dim[0]/2)
+ax.set_ylim3d(bottom=-dim[1]/2, top=dim[1]/2)
+ax.set_zlim3d(bottom=-dim[2]/2, top=dim[2]/2)
 
 ax.set_xlabel("x")
 ax.set_ylabel("y")
 ax.set_zlabel("z")
+
 """Unit cell visualization"""
 # plt.figure(3)
 # bx = plt.axes(projection='3d')

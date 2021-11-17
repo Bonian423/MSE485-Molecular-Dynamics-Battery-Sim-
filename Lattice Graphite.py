@@ -74,32 +74,8 @@ def lattice_construction(xnum, ynum, znum):
     return zlat
 
 def minimum_image(r, L):
-    PBC_pos = np.zeros([len(r),3])
+  return r - L*np.round(r / L)
 
-    num_i = 0
-    for i in r:
-        num_j = 0
-        for j in i:
-            if -L/2 <= j < L/2:
-                PBC_pos[num_i,num_j] = j
-            if j >= L/2:
-                j_add1 = j - (L)*(j//(L)+1)
-                if -L/2 <= j_add1 < L/2:
-                    PBC_pos[num_i,num_j] = j_add1
-                else:
-                    PBC_pos[num_i,num_j]  = j_add1 + L
-            if j < -L/2:
-                j_add1 = j - (L)*(j//(L)+1)
-                if -L/2 <= j_add1 < L/2:
-                    PBC_pos[num_i,num_j] = j_add1
-                else:
-                    PBC_pos[num_i,num_j]  = j_add1 + L    
-    
-            num_j = num_j + 1
-        num_i = num_i+1
-    
-    return PBC_pos
-    pass
 
 
 dim = 15
@@ -117,14 +93,24 @@ ax.view_init(-180, 90)
 ax.set_xlabel("x")
 ax.set_ylabel("y")
 ax.set_zlabel("z")
-plt.figure(2)
 
+plt.figure(2)
 ax = plt.axes(projection='3d')
 ax.scatter3D(a[:,0], a[:,1], a[:,2])
 ax.set_xlim3d(left=-dim/2, right=dim/2)
 ax.set_ylim3d(bottom=-dim/2, top=dim/2)
 ax.set_zlim3d(bottom=-dim/2, top=dim/2)
 ax.view_init(90, 270)
+ax.set_xlabel("x")
+ax.set_ylabel("y")
+ax.set_zlabel("z")
+
+plt.figure(3)
+ax = plt.axes(projection='3d')
+ax.scatter3D(a[:,0], a[:,1], a[:,2])
+ax.set_xlim3d(left=-dim/2, right=dim/2)
+ax.set_ylim3d(bottom=-dim/2, top=dim/2)
+ax.set_zlim3d(bottom=-dim/2, top=dim/2)
 ax.set_xlabel("x")
 ax.set_ylabel("y")
 ax.set_zlabel("z")
