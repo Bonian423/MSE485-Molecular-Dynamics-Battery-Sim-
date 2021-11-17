@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sat Oct 30 19:40:48 2021
-
 @author: Bonia
 """
-# -*- coding: utf-8 -*-
 
 import numpy as np
 from mpl_toolkits import mplot3d
@@ -36,10 +34,9 @@ Co_col = np.array([0.9,0.9])
 O_col = np.array([0.5,0.5,0.5,0.5])
 fixed_UC_color = np.concatenate((Co_col, O_col),axis = 0)
 
-def lattice_construction(xnum, ynum, znum):
+def lattice_construction(dim):
     """
     Construct a fixed lattice for SiO2 by defining how many unit cells we want in each dimension
-
     Parameters
     ----------
     xnum : int, >=1
@@ -52,6 +49,9 @@ def lattice_construction(xnum, ynum, znum):
     -------
     np.array structure with all the atoms in the constructed lattice
     """
+    xnum = dim[0]
+    ynum = dim[1]
+    znum = dim[2]
     xlat = C_UC_pos
     for x in range(1,xnum):
         xshift = lattice_params[0]
@@ -73,22 +73,45 @@ def lattice_construction(xnum, ynum, znum):
     print(zlat.shape)
     return zlat
 
+
+def shift_to_center(r,dim):
+    """shift lattice to the center of the space before applying minimum image
+    ---------
+    input:
+        r: lattice
+        dim: real space dimension of the entire lattice
+    output: shifted lattice      
+    """
+    xshift = dim[0]/2
+    yshift = dim[1]/2
+    for rtemp in r:
+        rtemp[0] -= xshift
+        rtemp[1] -= yshift
+    return r
 def minimum_image(r, L):
-  return r - L*np.round(r / L)
+    Lx = L[0]
+    Ly = L[1]
+    Lz = L[2]
+    r[:,0] = r[:,0] - Lx*np.round(r[:,0] / Lx)
+    r[:,1] = r[:,1] - Ly*np.round(r[:,1] / Ly)
+    r[:,2] = r[:,2] - Lz*np.round(r[:,2] / Lz)
+    return r
 
 
+numofcells = [6,6,3]
+adjustedlatticeparam = np.array([lattice_params[0]-lattice_params[1]*np.cos(np.pi/3),lattice_params[1]*np.sin(np.pi/3),lattice_params[2]])
+dim = np.multiply(lattice_params,numofcells)
 
-dim = 15
-a = lattice_construction(7, 8, 2)
-a = minimum_image(a, dim)
-
+a = lattice_construction(numofcells)
+a = shift_to_center(a, dim)
+a = minimum_image(a,dim)
 
 plt.figure(1)
 ax = plt.axes(projection='3d')
 ax.scatter3D(a[:,0], a[:,1], a[:,2])
-ax.set_xlim3d(left=-dim/2, right=dim/2)
-ax.set_ylim3d(bottom=-dim/2, top=dim/2)
-ax.set_zlim3d(bottom=-dim/2, top=dim/2)
+ax.set_xlim3d(left=-dim[0]/2, right=dim[0]/2)
+ax.set_ylim3d(bottom=-dim[1]/2, top=dim[1]/2)
+ax.set_zlim3d(bottom=-dim[2]/2, top=dim[2]/2)
 ax.view_init(-180, 90)
 ax.set_xlabel("x")
 ax.set_ylabel("y")
@@ -97,9 +120,9 @@ ax.set_zlabel("z")
 plt.figure(2)
 ax = plt.axes(projection='3d')
 ax.scatter3D(a[:,0], a[:,1], a[:,2])
-ax.set_xlim3d(left=-dim/2, right=dim/2)
-ax.set_ylim3d(bottom=-dim/2, top=dim/2)
-ax.set_zlim3d(bottom=-dim/2, top=dim/2)
+ax.set_xlim3d(left=-dim[0]/2, right=dim[0]/2)
+ax.set_ylim3d(bottom=-dim[1]/2, top=dim[1]/2)
+ax.set_zlim3d(bottom=-dim[2]/2, top=dim[2]/2)
 ax.view_init(90, 270)
 ax.set_xlabel("x")
 ax.set_ylabel("y")
@@ -108,13 +131,12 @@ ax.set_zlabel("z")
 plt.figure(3)
 ax = plt.axes(projection='3d')
 ax.scatter3D(a[:,0], a[:,1], a[:,2])
-ax.set_xlim3d(left=-dim/2, right=dim/2)
-ax.set_ylim3d(bottom=-dim/2, top=dim/2)
-ax.set_zlim3d(bottom=-dim/2, top=dim/2)
+ax.set_xlim3d(left=-dim[0]/2, right=dim[0]/2)
+ax.set_ylim3d(bottom=-dim[1]/2, top=dim[1]/2)
+ax.set_zlim3d(bottom=-dim[2]/2, top=dim[2]/2)
 ax.set_xlabel("x")
 ax.set_ylabel("y")
 ax.set_zlabel("z")
-
 """Unit cell visualization"""
 # plt.figure(3)
 # bx = plt.axes(projection='3d')

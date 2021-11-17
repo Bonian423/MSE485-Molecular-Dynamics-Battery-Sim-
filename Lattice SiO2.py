@@ -88,7 +88,7 @@ def lattice_construction(dim):
     print(xlat.shape)
     for y in range(1,ynum):
         yshift = lattice_params[1]*np.sin(np.pi/3)
-        xshift = 2.93855*np.cos(np.pi/3)
+        xshift = lattice_params[0]*np.cos(np.pi/3)
         shift = np.array([y*xshift,y*yshift,0])
         ylat = np.concatenate((ylat,np.add(shift, xlat)),axis =0)
         ycol = np.concatenate((xcol, ycol),axis =0)     
