@@ -101,8 +101,6 @@ class lattice:
             mindim: minimum dimension of the entire lattice
         output: cropped lattice based on the minimum dimension     
         """
-        print(r.shape)
-        print(mindim)
         oob = []
         for i in range(r.shape[0]):
             print(np.abs(r[i][0:3]))
@@ -110,7 +108,6 @@ class lattice:
                 oob.append(i)
         r = np.delete(r,oob,0)
         col = np.delete(col,oob)
-        print(r.shape)
         return r,col
     
 
@@ -136,13 +133,12 @@ class lattice:
             y0 = atom[1]
             atom[0] = x0-y0*np.cos(np.pi/3)
             atom[1] = y0*np.sin(np.pi/3)
-    
-    
+
         """properties of atoms at each position
         uses array: 
-            index 0: weight, unit: gram
-            index 1: charge, unit: eV
-            index 2: 
+            index 4: weight, unit: gram
+            index 5: charge, unit: eV
+            index 6: 
                 
             Unit Conversion: 1eV= 1.602*10**(-19) J
         """
@@ -152,7 +148,6 @@ class lattice:
         O_properties_list = np.array([[2.6567*10**(-23),0],[2.6567*10**(-23),0],[2.6567*10**(-23),0],[2.6567*10**(-23),0]])
         fixed_UC_prop = np.vstack((Co_properties_list, O_properties_list))
         UC_ary = np.concatenate((fixed_UC_pos, fixed_UC_prop),axis = 1)
-        print(UC_ary)
         Li_col = np.array([0.1,0.1])
         Co_col = np.array([0.9,0.9])
         O_col = np.array([0.5,0.5,0.5,0.5])
@@ -164,17 +159,17 @@ class lattice:
         lat , col = self.lattice_construction(numofcells, UC_ary, dim, fixed_UC_color)
         lat = self.shift_to_center(lat, dim)
         lat = self.minimum_image(lat,dim)
-        print(dim)
         self.mindim = np.min(dim)
         self.latticearray, self.col = self.crop_cubic(lat,self.mindim, col)
 
-unitcells = [10,10,2]
+
+unitcells = [4,4,3]
 lat = lattice()
 lat.init(unitcells)
 a = lat.latticearray
 b = lat.col
 dim = lat.mindim
-
+print(a.shape)
 
 plt.figure(1)
 ax = plt.axes(projection='3d')

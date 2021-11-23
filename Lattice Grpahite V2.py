@@ -56,7 +56,6 @@ class lattice:
         ylat = xlat
         yprop = xprop    
         ycol = xcol
-        print(xlat.shape)
         for y in range(1,ynum):
             yshift = self.lattice_params[1]*np.sin(np.pi/3)
             xshift = self.lattice_params[0]*np.cos(np.pi/3)
@@ -64,7 +63,6 @@ class lattice:
             ylat = np.concatenate((ylat,np.add(shift, xlat)),axis =0)
             ycol = np.concatenate((xcol, ycol),axis =0)     
             yprop = np.vstack([yprop, xprop])
-        print(ylat.shape)
         zlat = ylat
         zcol = ycol    
         zprop = yprop  
@@ -74,7 +72,6 @@ class lattice:
             zlat = np.concatenate((zlat,np.add(shift, ylat)),axis =0)        
             zcol = np.concatenate((zcol, ycol),axis =0)        
             zprop = np.vstack([zprop, yprop])      
-        print(zlat.shape)
         return np.concatenate((zlat, zprop),axis = 1), zcol
     def shift_to_center(self,r,dim):
         """shift lattice to the center of the space before applying minimum image
@@ -107,8 +104,6 @@ class lattice:
             mindim: minimum dimension of the entire lattice
         output: cropped lattice based on the minimum dimension     
         """
-        print(r.shape)
-        print(mindim)
         oob = []
         for i in range(r.shape[0]):
             print(np.abs(r[i][0:3]))
@@ -116,14 +111,13 @@ class lattice:
                 oob.append(i)
         r = np.delete(r,oob,0)
         col = np.delete(col,oob)
-        print(r.shape)
         return r,col
     
 
     def init(self, numofcells):
         """lattice parameters has format [x,y,z]"""
         """Unit of the lattice parameters: Angstrom"""
-        self.lattice_params = np.array([2.46772,2.46772*np.sin(np.pi/3), 8.68504])
+        self.lattice_params = np.array([2.46772,2.46772, 8.68504])
     
         """structure parameters has format [x,y,z]"""
         """structure parameters are formatted as ratios of lattice parameter"""
@@ -154,27 +148,29 @@ class lattice:
         c_properties_list = np.array([[1.9944*10**(-23),0],[1.9944*10**(-23),0],[1.9944*10**(-23),0],[1.9944*10**(-23),0]])
         fixed_UC_prop = c_properties_list
         UC_ary = np.concatenate((fixed_UC_pos, fixed_UC_prop),axis = 1)
-        print(UC_ary)
         c_col = np.array([0.1,0.1,0.1,0.1])
         fixed_UC_color = c_col
         adjustedlatticeparam = np.array([self.lattice_params[0]-self.lattice_params[1]*np.cos(np.pi/3),self.lattice_params[1]*np.sin(np.pi/3),self.lattice_params[2]])
         """real space dimension of lattice"""
         dim = np.multiply(adjustedlatticeparam,numofcells)
         """lattice manipulation into cubix"""
-        lat , col = self.lattice_construction(numofcells, UC_ary, dim, fixed_UC_color)
+        lat , self.col = self.lattice_construction(numofcells, UC_ary, dim, fixed_UC_color)
         lat = self.shift_to_center(lat, dim)
-        lat = self.minimum_image(lat,dim)
+        print(dim)
+        self.latticearray = self.minimum_image(lat,dim)
         print(dim)
         self.mindim = np.min(dim)
-        self.latticearray, self.col = self.crop_cubic(lat,self.mindim, col)
+        self.latticearray, self.col = self.crop_cubic(lat,self.mindim, self.col)
 
-unitcells = [7,7,3]
+
+unitcells = [4,4,2]
 lat = lattice()
 lat.init(unitcells)
 a = lat.latticearray
 b = lat.col
 dim = lat.mindim
-
+print(a.shape)
+print(dim)
 
 plt.figure(1)
 ax = plt.axes(projection='3d')
