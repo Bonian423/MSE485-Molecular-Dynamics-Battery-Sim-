@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 """
+Created on Tue Nov 23 16:16:21 2021
+
+@author: Bonia
+"""
+# -*- coding: utf-8 -*-
+"""
 Created on Sat Oct 30 15:26:12 2021
 
 @author: Bonia
@@ -117,23 +123,21 @@ class lattice:
     def init(self, numofcells):
         """lattice parameters has format [x,y,z]"""
         """Unit of the lattice parameters: Angstrom"""
-        self.lattice_params = np.array([2.93855,2.93855, 9.85993])
+        self.lattice_params = np.array([2.46772,2.46772*np.sin(np.pi/3), 8.68504])
     
         """structure parameters has format [x,y,z]"""
         """structure parameters are formatted as ratios of lattice parameter"""
-        Li_struct_param = np.array([[0.66667,    0.33333,    0.25821 ],[0.33333,    0.66667,    0.75821]])
-        Co_struct_param = np.array([[0.66667,    0.33333,    0.00051 ],[0.33333,    0.66667,    0.50051]])
-        O_struct_param = np.array([[0.00000,    0.00000,    0.88677],[0.00000,    0.00000,    0.38677],[0.66667,    0.33333,    0.61344],[0.33333,    0.66667,    0.11344]])
+        C_struct_param = np.array([[0.00,    0.00,    0.25 ],[0.0,    0.0,    0.75],[0.66667,    0.33333,    0.25 ],[0.33333,    0.66667,    0.75]])
+  
     
         """Atom Positions in unit cell in angstrom"""
-        Li_UC_pos = np.multiply(Li_struct_param, self.lattice_params)
-        Co_UC_pos = np.multiply(Co_struct_param, self.lattice_params)
-        O_UC_pos = np.multiply(O_struct_param, self.lattice_params)
+        C_UC_pos = np.multiply(C_struct_param, self.lattice_params)
+
     
-        fixed_UC_pos = np.concatenate((Co_UC_pos, O_UC_pos),axis = 0)
-        for atom in fixed_UC_pos:
+        for atom in C_UC_pos:
             x0 = atom[0]
             y0 = atom[1]
+            """this conversion is proved to be unnecessary"""
             atom[0] = x0-y0*np.cos(np.pi/3)
             atom[1] = y0*np.sin(np.pi/3)
     
