@@ -138,14 +138,15 @@ class lattice:
     
         """properties of atoms at each position
         uses array: 
-            index 0: weight, unit: gram
-            index 1: charge, unit: eV
-            index 2: 
+            index 0(3 in the final array with positions): weight, unit: gram
+            index 1(4): charge, unit: eV
+            index 2(5): epsilon in LJ force with Lithium
+            index 3(6): sigma in LJ force with Lithium
                 
             Unit Conversion: 1eV= 1.602*10**(-19) J
         """
     
-        c_properties_list = np.array([[1.9944*10**(-23),0],[1.9944*10**(-23),0],[1.9944*10**(-23),0],[1.9944*10**(-23),0]])
+        c_properties_list = np.array([[1.9944*10**(-23),0, 0.105,3.851],[1.9944*10**(-23),0, 0.105,3.851],[1.9944*10**(-23),0, 0.105,3.851],[1.9944*10**(-23),0, 0.105,3.851]])
         fixed_UC_prop = c_properties_list
         UC_ary = np.concatenate((fixed_UC_pos, fixed_UC_prop),axis = 1)
         c_col = np.array([0.1,0.1,0.1,0.1])

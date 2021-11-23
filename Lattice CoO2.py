@@ -118,12 +118,12 @@ class lattice:
     
         """structure parameters has format [x,y,z]"""
         """structure parameters are formatted as ratios of lattice parameter"""
-        Li_struct_param = np.array([[0.66667,    0.33333,    0.25821 ],[0.33333,    0.66667,    0.75821]])
+        #Li_struct_param = np.array([[0.66667,    0.33333,    0.25821 ],[0.33333,    0.66667,    0.75821]])
         Co_struct_param = np.array([[0.66667,    0.33333,    0.00051 ],[0.33333,    0.66667,    0.50051]])
         O_struct_param = np.array([[0.00000,    0.00000,    0.88677],[0.00000,    0.00000,    0.38677],[0.66667,    0.33333,    0.61344],[0.33333,    0.66667,    0.11344]])
     
         """Atom Positions in unit cell in angstrom"""
-        Li_UC_pos = np.multiply(Li_struct_param, self.lattice_params)
+        #Li_UC_pos = np.multiply(Li_struct_param, self.lattice_params)
         Co_UC_pos = np.multiply(Co_struct_param, self.lattice_params)
         O_UC_pos = np.multiply(O_struct_param, self.lattice_params)
     
@@ -136,19 +136,20 @@ class lattice:
 
         """properties of atoms at each position
         uses array: 
-            index 4: weight, unit: gram
-            index 5: charge, unit: eV
-            index 6: 
+            index 0(3 in the final array with positions): weight, unit: gram
+            index 1(4): charge, unit: eV
+            index 2(5): epsilon in LJ force with Lithium
+            index 3(6): sigma in LJ force with Lithium
                 
             Unit Conversion: 1eV= 1.602*10**(-19) J
         """
     
-        Li_properties_list = np.array([[1.1526*10**(-23),1],[1.1526*10**(-23),1]])
-        Co_properties_list = np.array([[9.7861*10**(-23),-1],[9.7861*10**(-23),-1]])
-        O_properties_list = np.array([[2.6567*10**(-23),0],[2.6567*10**(-23),0],[2.6567*10**(-23),0],[2.6567*10**(-23),0]])
+        #Li_properties_list = np.array([[1.1526*10**(-23),1],[1.1526*10**(-23),1]])
+        Co_properties_list = np.array([[9.7861*10**(-23),-1,0.3,3.151],[9.7861*10**(-23),-1,0.3,3.151]])
+        O_properties_list = np.array([[2.6567*10**(-23),0,0.6,1.4],[2.6567*10**(-23),0,0.6,1.4],[2.6567*10**(-23),0,0.6,1.4],[2.6567*10**(-23),0,0.6,1.4]])
         fixed_UC_prop = np.vstack((Co_properties_list, O_properties_list))
         UC_ary = np.concatenate((fixed_UC_pos, fixed_UC_prop),axis = 1)
-        Li_col = np.array([0.1,0.1])
+        #Li_col = np.array([0.1,0.1])
         Co_col = np.array([0.9,0.9])
         O_col = np.array([0.5,0.5,0.5,0.5])
         fixed_UC_color = np.concatenate((Co_col, O_col),axis = 0)
