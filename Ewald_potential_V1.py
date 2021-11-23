@@ -51,7 +51,7 @@ def my_legal_kvecs(maxn, lbox):
 
 #
 lbox = 5
-alpha = 100/(lbox**2)
+#alpha = 100/(lbox**2)
 cutoff = lbox/2
 
 
@@ -107,55 +107,7 @@ def displacement_table(coordinates, L):
 
 init_disp = displacement_table(init_pos,lbox)
 
-####3
-#mag_rho = 0.0
-#for i in init_kvecs:
-#    kx = i[0]
-#    ky = i[1]
-#    kz = i[2]
-#    if kx==0.0 and ky==0.0 and kz==0.0:
-#        continue
-#    else:
-#        continue
-#        #print(kx,ky,kz)
-#
-#
-#
-#V_tot = 0.0
-#for i in init_pos:
-#    ri_x = i[0]
-#    ri_y = i[1]
-#    ri_z = i[2]
-#    qi = i[3]
-#    for j in init_pos:
-#        rj_x = j[0]
-#        rj_y = j[1]
-#        rj_z = j[2]
-#        qj = j[3]
-#        
-#        rij_x = minimum_image(ri_x - rj_x,lbox)
-#        rij_y = minimum_image(ri_y - rj_y,lbox)
-#        rij_z = minimum_image(ri_z - rj_z,lbox)
-#        
-#        rij_mag = np.sqrt(rij_x**2 + rij_y**2 + rij_z**2)
-#        
-#        if rij_mag == 0.0:
-#            continue
-#        else:
-#            for k in init_kvecs:
-#                kx = k[0]
-#                ky = k[1]
-#                kz = k[2]
-#                
-#                dot_KR = (kx*rij_x) + (ky*rij_y) + (kz*rij_z)
-#                k_mag = np.sqrt(kx**2 + ky**2 + kz**2)
-#                #print(k_mag)
-#                if k_mag == 0.0:
-#                    continue
-#                else:
-#                    V_add = (1/(2*(lbox**3)))*(qi*qj)*((4*np.pi)/(k_mag**2))*(np.exp(-(k_mag**2)/(4*alpha)))*(abs(complex(math.cos(dot_KR),math.sin(dot_KR))))**2
-#                    #print(V_add)
-#                    V_tot = V_tot + V_add
+
 #            
             
         
@@ -238,9 +190,80 @@ def Ewald_pot(pos,kvecs,alph,vol):
     return Total_pot
 
 
+# Forces
+    
+def Ewald_force_k(pos,kvecs,alph,vol):
+    Ewald_force_arr = np.zeros([np.shape(pos)[0],np.shape(pos)[1]-1])
+    num_i = 0
+    for i in pos:
+        qi = i[3]
+        FX_add = 0.0
+        FY_add = 0.0
+        FZ_add = 0.0
+        for j in pos:
+            rij_x = i[0] - j[0]
+            rij_y = i[1] - j[1]
+            rij_z = i[2] - j[2]
+            qj = j[3]
+            rij_mag = np.sqrt(rij_x**2 + rij_y**2 + rij_z**2)
+            if rij_mag == 0.0:
+                continue
+            else:
+                for k in kvecs:
+                    kx = k[0]
+                    ky = k[1]
+                    kz = k[2]
+                    dot_KR = (kx*rij_x) + (ky*rij_y) + (kz*rij_z)
+                    k_mag = np.sqrt(kx**2 + ky**2 + kz**2)
+                    if k_mag == 0.0:
+                        continue
+                    else:
+                        fx_add = (qi*qj)*(1/vol)*(4*np.pi*kx)*(1/(k_mag**2))*(np.exp((-k_mag**2)/(4*alph)))*(np.sin(dot_KR))
+                        fy_add = (qi*qj)*(1/vol)*(4*np.pi*ky)*(1/(k_mag**2))*(np.exp((-k_mag**2)/(4*alph)))*(np.sin(dot_KR))
+                        fz_add = (qi*qj)*(1/vol)*(4*np.pi*kz)*(1/(k_mag**2))*(np.exp((-k_mag**2)/(4*alph)))*(np.sin(dot_KR))
+                        
+                        FX_add = FX_add + fx_add
+                        FY_add = FY_add + fy_add
+                        FZ_add = FZ_add + fz_add
+        Ewald_force_arr[num_i][0] = FX_add
+        Ewald_force_arr[num_i][1] = FY_add
+        Ewald_force_arr[num_i][2] = FY_add
+        num_i = num_i+1
+    
+    return Ewald_force_arr
 
 
-
-
-
+def Ewald_force_r(pos,alph):
+    Ewald_force_arr = np.zeros([np.shape(pos)[0],np.shape(pos)[1]-1])
+    num_i = 0
+    for i in pos:
+        qi = i[3]
+        FX_add = 0.0
+        FY_add = 0.0
+        FZ_add = 0.0
+        for j in pos:
+            rij_x = i[0] - j[0]
+            rij_y = i[1] - j[1]
+            rij_z = i[2] - j[2]
+            qj = j[3]
+            rij_mag = np.sqrt(rij_x**2 + rij_y**2 + rij_z**2)
+            if rij_mag == 0.0:
+                continue
+            else:
+                fx_add = (qi*qj)*((2*np.sqrt((alph)/(np.pi)))*(np.exp(-alph*(rij_mag**2))) + (1/rij_mag)*(math.erfc(np.sqrt(alph)*(rij_mag))))*(rij_x/(rij_mag**2))
+                fy_add = (qi*qj)*((2*np.sqrt((alph)/(np.pi)))*(np.exp(-alph*(rij_mag**2))) + (1/rij_mag)*(math.erfc(np.sqrt(alph)*(rij_mag))))*(rij_y/(rij_mag**2))
+                fz_add = (qi*qj)*((2*np.sqrt((alph)/(np.pi)))*(np.exp(-alph*(rij_mag**2))) + (1/rij_mag)*(math.erfc(np.sqrt(alph)*(rij_mag))))*(rij_z/(rij_mag**2))
+                
+                FX_add = FX_add + fx_add
+                FY_add = FY_add + fy_add
+                FZ_add = FZ_add + fz_add
+        Ewald_force_arr[num_i][0] = FX_add
+        Ewald_force_arr[num_i][1] = FY_add
+        Ewald_force_arr[num_i][2] = FZ_add
+        num_i = num_i + 1
+    return Ewald_force_arr
+    
+def Ewald_force(pos,kvecs,alph,vol):
+    tot_force_arr = Ewald_force_r(pos,alph) + Ewald_force_k(pos,kvecs,alph,vol)
+    return tot_force_arr
 
