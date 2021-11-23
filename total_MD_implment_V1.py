@@ -7,9 +7,12 @@ Created on Tue Nov 23 15:15:32 2021
 
 #implement MD Code
 import total_MD_code_V1 as F1
+import Lattice_Graphite as coor
 import numpy as np
+import matplotlib.pyplot as plt
+import time
 
-def advance(pos, vel, mass, dt, disp, dist, rc, L):
+def advance(pos, vel, mass, dt, disp, dist, rc, L,kvecs):
     """
     advance system according to velocity verlet
 
@@ -27,11 +30,13 @@ def advance(pos, vel, mass, dt, disp, dist, rc, L):
         new positions, new velocities, new displacement table,
         and new distance table
     """
-    accel = (F1.force(disp, dist, rc) + F1.Ewald_force(pos,F1.my_legal_kvecs(N_max,L),alpha,V,L)) / mass
+    accel = (F1.force(disp, dist, rc) + F1.Ewald_force(pos,kvecs,alpha,V,L)) / mass
     #move
     vel_half = vel + 0.5*dt*accel
-    pos_new = pos + dt*vel_half
+    pos_new = pos #+ dt*vel_half
+    pos_new[:,[0,1,2]] = pos[:,[0,1,2]] + dt*vel_half
     pos_new = F1.minimum_image(pos_new, L)
+    #print(pos_new)
     disp_new = F1.displacement_table(pos_new, L)
     dist_new = np.linalg.norm(disp_new, axis=-1)
     #repeat force calculation for new pos
@@ -42,24 +47,30 @@ def advance(pos, vel, mass, dt, disp, dist, rc, L):
 
 #initial Values
 T = 1.0
-L = 4.0
+L = 10.0
 M = 1.0
 cutoff = L/2
-N = 8
+N = 16
 V = L**3
 alpha = (np.pi)*(N/(V**2))**(1/3)
 
-steps = 100
+steps = 20
 timestep = 0.03
 
 N_max = 4
+Karr = F1.my_legal_kvecs(N_max,L)
 
 num_bins = 14
 dr_ = 0.25
 
 #system
-#coordinates = cubic_lattice(4, length)
+coordinates = coor.a
+Qs = np.random.uniform(-1,1,len(coordinates))
+Qs = np.array([Qs]).T
+coordinates = np.append(coordinates,Qs,axis=1)
 velocities = F1.initial_velocities(N, M, T)
+
+coorTEst = coordinates.copy()
 
 #tables required to compute quantities like forces, energies
 displacements = F1.displacement_table(coordinates, L)
@@ -80,10 +91,11 @@ G_r = []
 r_ = []
 
 veloci = []
+t0 = time.time()
 for _ in range(steps):
     coordinates, velocities, displacements, distances = advance(coordinates,\
             velocities, M, timestep, displacements, distances, cutoff,\
-            L)
+            L,K_vecs)
     
     PE.append(F1.potential(distances, cutoff)+F1.Ewald_pot(coordinates,F1.my_legal_kvecs(N_max,L),alpha,V,L))
     PE_EW.append(F1.Ewald_pot(coordinates,F1.my_legal_kvecs(N_max,L),alpha,V,L))
@@ -99,7 +111,9 @@ for _ in range(steps):
     
     G_r.append(F1.my_pair_correlation(F1.dist_ravel(distances),N,num_bins,dr_,L)[0])
     r_.append(F1.my_pair_correlation(F1.dist_ravel(distances),N,num_bins,dr_,L)[1])
-
+    
+t1 = time.time()
+print(t1-t0)
 
 
 
