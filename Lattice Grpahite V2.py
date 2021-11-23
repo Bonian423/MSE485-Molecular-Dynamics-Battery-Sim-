@@ -160,11 +160,10 @@ class lattice:
         print(dim)
         self.latticearray = self.minimum_image(lat,dim)
         print(dim)
-        self.mindim = np.min(dim)
+        self.mindim = 5.8770999999999995
         self.latticearray, self.col = self.crop_cubic(lat,self.mindim, self.col)
 
-
-unitcells = [4,4,2]
+unitcells = [6,6,2]
 lat = lattice()
 lat.init(unitcells)
 a = lat.latticearray
