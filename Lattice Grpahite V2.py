@@ -134,10 +134,10 @@ class lattice:
         C_UC_pos = np.multiply(C_struct_param, self.lattice_params)
 
     
-        for atom in C_UC_pos:
+        fixed_UC_pos = C_UC_pos
+        for atom in fixed_UC_pos:
             x0 = atom[0]
             y0 = atom[1]
-            """this conversion is proved to be unnecessary"""
             atom[0] = x0-y0*np.cos(np.pi/3)
             atom[1] = y0*np.sin(np.pi/3)
     
@@ -151,16 +151,12 @@ class lattice:
             Unit Conversion: 1eV= 1.602*10**(-19) J
         """
     
-        Li_properties_list = np.array([[1.1526*10**(-23),1],[1.1526*10**(-23),1]])
-        Co_properties_list = np.array([[9.7861*10**(-23),-1],[9.7861*10**(-23),-1]])
-        O_properties_list = np.array([[2.6567*10**(-23),0],[2.6567*10**(-23),0],[2.6567*10**(-23),0],[2.6567*10**(-23),0]])
-        fixed_UC_prop = np.vstack((Co_properties_list, O_properties_list))
+        c_properties_list = np.array([[1.9944*10**(-23),0],[1.9944*10**(-23),0],[1.9944*10**(-23),0],[1.9944*10**(-23),0]])
+        fixed_UC_prop = c_properties_list
         UC_ary = np.concatenate((fixed_UC_pos, fixed_UC_prop),axis = 1)
         print(UC_ary)
-        Li_col = np.array([0.1,0.1])
-        Co_col = np.array([0.9,0.9])
-        O_col = np.array([0.5,0.5,0.5,0.5])
-        fixed_UC_color = np.concatenate((Co_col, O_col),axis = 0)
+        c_col = np.array([0.1,0.1,0.1,0.1])
+        fixed_UC_color = c_col
         adjustedlatticeparam = np.array([self.lattice_params[0]-self.lattice_params[1]*np.cos(np.pi/3),self.lattice_params[1]*np.sin(np.pi/3),self.lattice_params[2]])
         """real space dimension of lattice"""
         dim = np.multiply(adjustedlatticeparam,numofcells)
@@ -172,7 +168,7 @@ class lattice:
         self.mindim = np.min(dim)
         self.latticearray, self.col = self.crop_cubic(lat,self.mindim, col)
 
-unitcells = [10,10,2]
+unitcells = [7,7,3]
 lat = lattice()
 lat.init(unitcells)
 a = lat.latticearray
