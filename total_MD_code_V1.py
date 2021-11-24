@@ -43,12 +43,12 @@ def Coulmb_kspace(pos,kvecs,alph,vol,lbox):
         ri_x = i[0]
         ri_y = i[1]
         ri_z = i[2]
-        qi = i[3]
+        qi = i[4]
         for j in pos:
             rj_x = j[0]
             rj_y = j[1]
             rj_z = j[2]
-            qj = j[3]
+            qj = j[4]
         
             rij_x = minimum_image(ri_x - rj_x,lbox)
             rij_y = minimum_image(ri_y - rj_y,lbox)
@@ -91,12 +91,12 @@ def Coulmb_realspace(pos,alph,lbox):
         ri_x = i[0]
         ri_y = i[1]
         ri_z = i[2]
-        qi = i[3]
+        qi = i[4]
         for j in pos:
             rj_x = j[0]
             rj_y = j[1]
             rj_z = j[2]
-            qj = j[3]
+            qj = j[4]
         
             rij_x = minimum_image(ri_x - rj_x,lbox)
             rij_y = minimum_image(ri_y - rj_y,lbox)
@@ -116,10 +116,10 @@ def Ewald_pot(pos,kvecs,alph,vol,lbox):
     return Total_pot
 
 def Ewald_force_k(pos,kvecs,alph,vol,lbox):
-    Ewald_force_arr = np.zeros([np.shape(pos)[0],np.shape(pos)[1]-1])
+    Ewald_force_arr = np.zeros([np.shape(pos)[0],np.shape(pos)[1]-4])
     num_i = 0
     for i in pos:
-        qi = i[3]
+        qi = i[4]
         FX_add = 0.0
         FY_add = 0.0
         FZ_add = 0.0
@@ -127,7 +127,7 @@ def Ewald_force_k(pos,kvecs,alph,vol,lbox):
             rij_x = minimum_image(i[0] - j[0],lbox)
             rij_y = minimum_image(i[1] - j[1],lbox)
             rij_z = minimum_image(i[2] - j[2],lbox)
-            qj = j[3]
+            qj = j[4]
             rij_mag = np.sqrt(rij_x**2 + rij_y**2 + rij_z**2)
             if rij_mag == 0.0:
                 continue
@@ -157,10 +157,10 @@ def Ewald_force_k(pos,kvecs,alph,vol,lbox):
 
 
 def Ewald_force_r(pos,alph,lbox):
-    Ewald_force_arr = np.zeros([np.shape(pos)[0],np.shape(pos)[1]-1])
+    Ewald_force_arr = np.zeros([np.shape(pos)[0],np.shape(pos)[1]-4])
     num_i = 0
     for i in pos:
-        qi = i[3]
+        qi = i[4]
         FX_add = 0.0
         FY_add = 0.0
         FZ_add = 0.0
@@ -168,7 +168,7 @@ def Ewald_force_r(pos,alph,lbox):
             rij_x = minimum_image(i[0] - j[0],lbox)
             rij_y = minimum_image(i[1] - j[1],lbox)
             rij_z = minimum_image(i[2] - j[2],lbox)
-            qj = j[3]
+            qj = j[4]
             rij_mag = np.sqrt(rij_x**2 + rij_y**2 + rij_z**2)
             if rij_mag == 0.0:
                 continue
