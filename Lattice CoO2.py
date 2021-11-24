@@ -118,16 +118,16 @@ class lattice:
     
         """structure parameters has format [x,y,z]"""
         """structure parameters are formatted as ratios of lattice parameter"""
-        #Li_struct_param = np.array([[0.66667,    0.33333,    0.25821 ],[0.33333,    0.66667,    0.75821]])
+        Li_struct_param = np.array([[0.66667,    0.33333,    0.25821 ],[0.33333,    0.66667,    0.75821]])
         Co_struct_param = np.array([[0.66667,    0.33333,    0.00051 ],[0.33333,    0.66667,    0.50051]])
         O_struct_param = np.array([[0.00000,    0.00000,    0.88677],[0.00000,    0.00000,    0.38677],[0.66667,    0.33333,    0.61344],[0.33333,    0.66667,    0.11344]])
     
         """Atom Positions in unit cell in angstrom"""
-        #Li_UC_pos = np.multiply(Li_struct_param, self.lattice_params)
+        Li_UC_pos = np.multiply(Li_struct_param, self.lattice_params)
         Co_UC_pos = np.multiply(Co_struct_param, self.lattice_params)
         O_UC_pos = np.multiply(O_struct_param, self.lattice_params)
     
-        fixed_UC_pos = np.concatenate((Co_UC_pos, O_UC_pos),axis = 0)
+        fixed_UC_pos = np.concatenate((Co_UC_pos, O_UC_pos, Li_UC_pos),axis = 0)
         for atom in fixed_UC_pos:
             x0 = atom[0]
             y0 = atom[1]
@@ -144,15 +144,15 @@ class lattice:
             Unit Conversion: 1eV= 1.602*10**(-19) J
         """
     
-        #Li_properties_list = np.array([[1.1526*10**(-23),1],[1.1526*10**(-23),1]])
+        Li_properties_list = np.array([[1.1526*10**(-23),1,0.305,2.051],[1.1526*10**(-23),1,0.305,2.051]])
         Co_properties_list = np.array([[9.7861*10**(-23),-1,0.3,3.151],[9.7861*10**(-23),-1,0.3,3.151]])
         O_properties_list = np.array([[2.6567*10**(-23),0,0.6,1.4],[2.6567*10**(-23),0,0.6,1.4],[2.6567*10**(-23),0,0.6,1.4],[2.6567*10**(-23),0,0.6,1.4]])
-        fixed_UC_prop = np.vstack((Co_properties_list, O_properties_list))
+        fixed_UC_prop = np.vstack((Co_properties_list, O_properties_list,Li_properties_list))
         UC_ary = np.concatenate((fixed_UC_pos, fixed_UC_prop),axis = 1)
-        #Li_col = np.array([0.1,0.1])
+        Li_col = np.array([0.1,0.1])
         Co_col = np.array([0.9,0.9])
         O_col = np.array([0.5,0.5,0.5,0.5])
-        fixed_UC_color = np.concatenate((Co_col, O_col),axis = 0)
+        fixed_UC_color = np.concatenate((Co_col, O_col,Li_col),axis = 0)
         adjustedlatticeparam = np.array([self.lattice_params[0]-self.lattice_params[1]*np.cos(np.pi/3),self.lattice_params[1]*np.sin(np.pi/3),self.lattice_params[2]])
         """real space dimension of lattice"""
         dim = np.multiply(adjustedlatticeparam,numofcells)
@@ -170,6 +170,7 @@ lat.init(unitcells)
 a = lat.latticearray
 b = lat.col
 dim = lat.mindim
+print(dim)
 print(a.shape)
 
 plt.figure(1)
