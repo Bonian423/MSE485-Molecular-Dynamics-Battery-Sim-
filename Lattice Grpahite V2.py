@@ -106,15 +106,24 @@ class lattice:
         """
         oob = []
         for i in range(r.shape[0]):
-            print(np.abs(r[i][0:3]))
             if np.abs(r[i][0]) > mindim/2 or np.abs(r[i][1]) > mindim/2 or np.abs(r[i][2]) > mindim/2:
                 oob.append(i)
         r = np.delete(r,oob,0)
         col = np.delete(col,oob)
         return r,col
     
+    def removedup(self,r):
+        rnew = r
+        dellist = []
+        for i in range (0,r.shape[0]):
+            for j in range (i+1,r.shape[0]):
+                rij = np.abs(np.subtract(r[j],r[i]))
+                if np.sum(rij) <  0.0001:
+                    dellist.append(j)
+        rnew = np.delete(rnew,dellist,0)
+        return rnew   
 
-    def init(self, numofcells):
+    def init(self, numofcells,boxdim):
         """lattice parameters has format [x,y,z]"""
         """Unit of the lattice parameters: Angstrom"""
         self.lattice_params = np.array([2.46772,2.46772, 8.68504])
@@ -158,14 +167,16 @@ class lattice:
         lat , self.col = self.lattice_construction(numofcells, UC_ary, dim, fixed_UC_color)
         lat = self.shift_to_center(lat, dim)
         print(dim)
-        self.latticearray = self.minimum_image(lat,dim)
+        lat= self.minimum_image(lat,dim)
+        lat = self.removedup(lat)
         print(dim)
-        self.mindim = 5.8770999999999995
+        self.mindim = boxdim
         self.latticearray, self.col = self.crop_cubic(lat,self.mindim, self.col)
 
-unitcells = [6,6,2]
+unitcells = [6,6,3]
+boxdimension =7
 lat = lattice()
-lat.init(unitcells)
+lat.init(unitcells,boxdimension)
 a = lat.latticearray
 b = lat.col
 dim = lat.mindim
@@ -174,7 +185,7 @@ print(dim)
 
 plt.figure(1)
 ax = plt.axes(projection='3d')
-ax.scatter3D(a[:,0], a[:,1], a[:,2], c = b)
+ax.scatter3D(a[:,0], a[:,1], a[:,2])
 ax.set_xlim3d(left=-dim/2, right=dim/2)
 ax.set_ylim3d(bottom=-dim/2, top=dim/2)
 ax.set_zlim3d(bottom=-dim/2, top=dim/2)
@@ -184,7 +195,7 @@ ax.set_ylabel("y")
 ax.set_zlabel("z")
 plt.figure(2)
 ax = plt.axes(projection='3d')
-ax.scatter3D(a[:,0], a[:,1], a[:,2], c = b)
+ax.scatter3D(a[:,0], a[:,1], a[:,2])
 ax.set_xlim3d(left=-dim/2, right=dim/2)
 ax.set_ylim3d(bottom=-dim/2, top=dim/2)
 ax.set_zlim3d(bottom=-dim/2, top=dim/2)
@@ -194,7 +205,7 @@ ax.set_ylabel("y")
 ax.set_zlabel("z")
 plt.figure(3)
 ax = plt.axes(projection='3d')
-ax.scatter3D(a[:,0], a[:,1], a[:,2], c = b)
+ax.scatter3D(a[:,0], a[:,1], a[:,2])
 ax.set_xlim3d(left=-dim/2, right=dim/2)
 ax.set_ylim3d(bottom=-dim/2, top=dim/2)
 ax.set_zlim3d(bottom=-dim/2, top=dim/2)
