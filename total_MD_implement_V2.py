@@ -12,7 +12,7 @@ import total_MD_code_V2 as F1
 #import Lattice_Graphite as coor
 import LAttice_SiO2 as coor
 import numpy as np
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import time
 
 ##Initial Values
@@ -26,8 +26,8 @@ N = np.shape(initial_pos)[0]
 V = L**3
 alpha = (np.pi)*(N/(V**2))**(1/3)
 #
-steps = 5
-timestep = 0.03
+steps = 10
+timestep = 1e-16
 #
 N_max = 4
 Karr = F1.my_legal_kvecs(N_max,L)
@@ -59,10 +59,11 @@ def advance(pos, vel, dt, disp, dist, rc, L,kvecs,E):
     """
     #print(F1.Ewald_force(pos,kvecs,alpha,V,L))
     accel = (F1.forceLJ(pos,rc,L) + F1.Ewald_force(pos,kvecs,alpha,V,L) + F1.external_force(pos,E))
+    #print(accel)
     for i in range(len(accel)):
         m = pos[i][3]*(1/1000)
         accel[i] = accel[i]/m
-    
+    #print(accel)
     #move
     vel_half = vel + 0.5*dt*accel
     pos_new = pos #+ dt*vel_half
