@@ -177,7 +177,6 @@ def dist_calc(r):
     for i in range (0,r.shape[0]):
         for j in range (i+1,r.shape[0]):
             rij = np.subtract(r[j],r[i])
-            print(rij)
         
 unitcells = [6,6,5]
 boxdimension =7

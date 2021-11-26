@@ -9,7 +9,7 @@ Created on Thu Nov 25 17:21:52 2021
 #import libraries
 import numpy as np
 import math
-import LAttice_SiO2 as coor
+import Lattice_CoO2 as coor
 
 posi = coor.a
 
@@ -190,7 +190,7 @@ def Ewald_force_r(pos,alph,lbox):
     
 def Ewald_force(pos,kvecs,alph,vol,lbox):
     tot_force_arr = Ewald_force_r(pos,alph,lbox) + Ewald_force_k(pos,kvecs,alph,vol,lbox)
-    tot_force_arr = tot_force_arr*(8.2387e-3)
+    tot_force_arr = tot_force_arr*(8.2387e-3)*1.60217662 * 10-19
     return tot_force_arr
 
 #Functions from HW3/4
@@ -487,4 +487,31 @@ def external_force(pos,E):
         Fq = q*E
         F_ext[fnum] = Fq
         fnum = fnum + 1
-    return F_ext
+    return F_ext*1.60217662 * 10-19
+
+
+def Li_exit_state(r,L,Li_state_ary, vel, step):
+    """
+    Input:
+        L: bopx dimension
+        r: lattice matrix
+        Li_state_ary: Lithium exit state arry
+    output: 
+        Li_state_ary: Lithium exit state arry
+        """
+    if r.shape[0] >0:
+        print("dim0:"+ str(r.shape[0]))
+        dellist = []
+        for i in range (0,r.shape[0]):
+            if r[i][0] >= L/2:
+                row = np.append(step,r[i])
+                row = np.append(row,vel[i]).T
+                Li_state_ary=np.concatenate((Li_state_ary,row),axis = 0)
+                dellist.append(i)
+                print("deleted")
+                print(i)
+        rnew = np.delete(r,dellist,0)
+        velnew = np.delete(vel,dellist,0)
+    else:
+        rnew = r
+    return rnew, Li_state_ary, velnew
