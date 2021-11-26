@@ -11,6 +11,8 @@ import numpy as np
 import math
 import LAttice_SiO2 as coor
 
+posi = coor.a
+
 #
 #import pythonn functions needed
 #Ewald necessary functions
@@ -112,6 +114,7 @@ def Coulmb_realspace(pos,alph,lbox):
 
 def Ewald_pot(pos,kvecs,alph,vol,lbox):
     Total_pot = Coulmb_kspace(pos,kvecs,alph,vol,lbox) - Coulmb_selfInteract(pos,alph) + Coulmb_realspace(pos,alph,lbox)
+    Total_pot = Total_pot*(4.359e-18)
     return Total_pot
 
 def Ewald_force_k(pos,kvecs,alph,vol,lbox):
@@ -187,6 +190,7 @@ def Ewald_force_r(pos,alph,lbox):
     
 def Ewald_force(pos,kvecs,alph,vol,lbox):
     tot_force_arr = Ewald_force_r(pos,alph,lbox) + Ewald_force_k(pos,kvecs,alph,vol,lbox)
+    tot_force_arr = tot_force_arr*(8.2387e-3)
     return tot_force_arr
 
 #Functions from HW3/4
@@ -316,6 +320,7 @@ def potentialLJ(pos,rc,L):
             #print(V_total)
                 
     V_LJ = V_total/2
+    V_LJ = V_LJ*(4.359e-18)
     return V_LJ
 
 def forceLJ(pos,rc,L):
@@ -363,6 +368,7 @@ def forceLJ(pos,rc,L):
         Force_arr[fnum,1] = Fy
         Force_arr[fnum,2] = Fz
         fnum = fnum + 1
+    Force_arr = Force_arr*(8.2387e-8)
     return Force_arr
 
 ## Extra calculations
