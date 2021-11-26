@@ -479,3 +479,12 @@ def dist_ravel(dist):
             ravel2 = np.append(ravel2,i)
     return ravel2
 
+def external_force(pos,E):
+    F_ext = np.zeros([np.shape(pos)[0],np.shape(pos)[1]-4])
+    fnum = 0
+    for i in pos:
+        q = i[4]
+        Fq = q*E
+        F_ext[fnum] = Fq
+        fnum = fnum + 1
+    return F_ext

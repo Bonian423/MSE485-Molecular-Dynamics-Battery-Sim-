@@ -35,10 +35,11 @@ Karr = F1.my_legal_kvecs(N_max,L)
 num_bins = 14
 dr_ = 0.25
 
+Efield = np.array([1,0,0])
 
 #########
 #Advance function
-def advance(pos, vel, dt, disp, dist, rc, L,kvecs):
+def advance(pos, vel, dt, disp, dist, rc, L,kvecs,E):
     """
     advance system according to velocity verlet
 
@@ -57,7 +58,7 @@ def advance(pos, vel, dt, disp, dist, rc, L,kvecs):
         and new distance table
     """
     #print(F1.Ewald_force(pos,kvecs,alpha,V,L))
-    accel = (F1.forceLJ(pos,rc,L) + F1.Ewald_force(pos,kvecs,alpha,V,L))
+    accel = (F1.forceLJ(pos,rc,L) + F1.Ewald_force(pos,kvecs,alpha,V,L) + F1.external_force(pos,E))
     for i in range(len(accel)):
         m = pos[i][3]*(1/1000)
         accel[i] = accel[i]/m
@@ -71,7 +72,7 @@ def advance(pos, vel, dt, disp, dist, rc, L,kvecs):
     disp_new = F1.displacement_table(pos_new, L)
     dist_new = np.linalg.norm(disp_new, axis=-1)
     #repeat force calculation for new pos
-    accel = (F1.forceLJ(pos_new,rc,L) + F1.Ewald_force(pos_new,kvecs,alpha,V,L))
+    accel = (F1.forceLJ(pos_new,rc,L) + F1.Ewald_force(pos_new,kvecs,alpha,V,L)+ F1.external_force(pos,E))
     for i in range(len(accel)):
         m = pos[i][3]*(1/1000)
         accel[i] = accel[i]/m
@@ -105,7 +106,7 @@ t0 = time.time()
 for _ in range(steps):
     coordinates, velocities, displacements, distances = advance(coordinates,\
             velocities,timestep, displacements, distances, cutoff,\
-            L,K_vecs)
+            L,K_vecs,Efield)
     
     PE.append(F1.potentialLJ(coordinates,cutoff,L)+F1.Ewald_pot(coordinates,F1.my_legal_kvecs(N_max,L),alpha,V,L))
     PE_EW.append(F1.Ewald_pot(coordinates,F1.my_legal_kvecs(N_max,L),alpha,V,L))
