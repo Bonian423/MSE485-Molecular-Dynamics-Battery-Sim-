@@ -9,7 +9,7 @@ Created on Thu Nov 25 17:21:52 2021
 #import libraries
 import numpy as np
 import math
-import LAttice_SiO2 as coor
+import Lattice_CoO2 as coor
 
 posi = coor.a
 T = 300
