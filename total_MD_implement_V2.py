@@ -27,7 +27,7 @@ V = L**3
 alpha = (np.pi)*(N/(V**2))**(1/3)
 #
 steps = 10
-timestep = 1e-13 
+timestep = 1e-12 
 #
 N_max = 4
 Karr = F1.my_legal_kvecs(N_max,L)
@@ -113,6 +113,7 @@ for i in range(0,steps):
     PE.append(F1.potentialLJ(coordinates,cutoff,L)+F1.Ewald_pot(coordinates,F1.my_legal_kvecs(N_max,L),alpha,V,L))
     PE_EW.append(F1.Ewald_pot(coordinates,F1.my_legal_kvecs(N_max,L),alpha,V,L))
     KE.append(F1.kinetic(coordinates,velocities)[0])
+    print("KE:"+str(KE[i]))
     E.append(F1.potentialLJ(coordinates,cutoff,L) + F1.kinetic(coordinates,velocities)[0])
     P.append(F1.kinetic(coordinates,velocities)[1])
     Temp.append(F1.kinetic(coordinates,velocities)[2])

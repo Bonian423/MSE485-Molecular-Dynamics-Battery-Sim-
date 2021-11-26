@@ -510,6 +510,7 @@ def Li_exit_state(r,L,Li_state_ary, vel, step):
                 dellist.append(i)
                 print("deleted")
                 print(i)
+        rnew = minimum_image(r, L)
         rnew = np.delete(r,dellist,0)
         velnew = np.delete(vel,dellist,0)
     else:
