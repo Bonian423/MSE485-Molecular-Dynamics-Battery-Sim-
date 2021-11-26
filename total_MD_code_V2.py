@@ -9,9 +9,11 @@ Created on Thu Nov 25 17:21:52 2021
 #import libraries
 import numpy as np
 import math
-import Lattice_CoO2 as coor
+import LAttice_SiO2 as coor
 
 posi = coor.a
+T = 300
+N = 39
 
 #
 #import pythonn functions needed
@@ -44,12 +46,12 @@ def Coulmb_kspace(pos,kvecs,alph,vol,lbox):
         ri_x = i[0]
         ri_y = i[1]
         ri_z = i[2]
-        qi = i[4]
+        qi = i[4]*(1.6e-19)
         for j in pos:
             rj_x = j[0]
             rj_y = j[1]
             rj_z = j[2]
-            qj = j[4]
+            qj = j[4]*(1.6e-19)
         
             rij_x = minimum_image(ri_x - rj_x,lbox)
             rij_y = minimum_image(ri_y - rj_y,lbox)
@@ -80,7 +82,7 @@ def Coulmb_selfInteract(pos,alph):
     V_total_int = 0.0
     alpha_factor = (-alph)/(np.sqrt(np.pi))
     for i in pos:
-        qi = i[3]
+        qi = i[3]*(1.6e-19)
         V_add_int = (alpha_factor)*(qi)
         V_total_int = V_total_int + V_add_int
     return V_total_int
@@ -92,12 +94,12 @@ def Coulmb_realspace(pos,alph,lbox):
         ri_x = i[0]
         ri_y = i[1]
         ri_z = i[2]
-        qi = i[4]
+        qi = i[4]*(1.6e-19)
         for j in pos:
             rj_x = j[0]
             rj_y = j[1]
             rj_z = j[2]
-            qj = j[4]
+            qj = j[4]*(1.6e-19)
         
             rij_x = minimum_image(ri_x - rj_x,lbox)
             rij_y = minimum_image(ri_y - rj_y,lbox)
@@ -121,7 +123,7 @@ def Ewald_force_k(pos,kvecs,alph,vol,lbox):
     Ewald_force_arr = np.zeros([np.shape(pos)[0],np.shape(pos)[1]-4])
     num_i = 0
     for i in pos:
-        qi = i[4]
+        qi = i[4]*(1.6e-19)
         FX_add = 0.0
         FY_add = 0.0
         FZ_add = 0.0
@@ -129,7 +131,7 @@ def Ewald_force_k(pos,kvecs,alph,vol,lbox):
             rij_x = minimum_image(i[0] - j[0],lbox)
             rij_y = minimum_image(i[1] - j[1],lbox)
             rij_z = minimum_image(i[2] - j[2],lbox)
-            qj = j[4]
+            qj = j[4]*(1.6e-19)
             rij_mag = np.sqrt(rij_x**2 + rij_y**2 + rij_z**2)
             if rij_mag == 0.0:
                 continue
@@ -162,7 +164,7 @@ def Ewald_force_r(pos,alph,lbox):
     Ewald_force_arr = np.zeros([np.shape(pos)[0],np.shape(pos)[1]-4])
     num_i = 0
     for i in pos:
-        qi = i[4]
+        qi = i[4]*(1.6e-19)
         FX_add = 0.0
         FY_add = 0.0
         FZ_add = 0.0
@@ -170,7 +172,7 @@ def Ewald_force_r(pos,alph,lbox):
             rij_x = minimum_image(i[0] - j[0],lbox)
             rij_y = minimum_image(i[1] - j[1],lbox)
             rij_z = minimum_image(i[2] - j[2],lbox)
-            qj = j[4]
+            qj = j[4]*(1.6e-19)
             rij_mag = np.sqrt(rij_x**2 + rij_y**2 + rij_z**2)
             if rij_mag == 0.0:
                 continue
@@ -190,7 +192,7 @@ def Ewald_force_r(pos,alph,lbox):
     
 def Ewald_force(pos,kvecs,alph,vol,lbox):
     tot_force_arr = Ewald_force_r(pos,alph,lbox) + Ewald_force_k(pos,kvecs,alph,vol,lbox)
-    tot_force_arr = tot_force_arr*(8.2387e-3)*1.60217662 * 10-19
+    tot_force_arr = tot_force_arr*(8.2387e-3)
     return tot_force_arr
 
 #Functions from HW3/4
@@ -222,7 +224,7 @@ def initial_velocities(pos,N,T):
         for j in range(0,3):
             random_T1 = np.random.normal()
             init_vel = (np.sqrt((Kb*T)/(m)))*(random_T1)
-            init_v[v_num,j] = init_vel
+            init_v[v_num,j] = 0.0
         v_num = v_num + 1
     return init_v
 #displacement tables
@@ -483,36 +485,8 @@ def external_force(pos,E):
     F_ext = np.zeros([np.shape(pos)[0],np.shape(pos)[1]-4])
     fnum = 0
     for i in pos:
-        q = i[4]
+        q = i[4]*(1.6e-19)
         Fq = q*E
         F_ext[fnum] = Fq
         fnum = fnum + 1
-    return F_ext*1.60217662 * 10-19
-
-
-def Li_exit_state(r,L,Li_state_ary, vel, step):
-    """
-    Input:
-        L: bopx dimension
-        r: lattice matrix
-        Li_state_ary: Lithium exit state arry
-    output: 
-        Li_state_ary: Lithium exit state arry
-        """
-    if r.shape[0] >0:
-        print("dim0:"+ str(r.shape[0]))
-        dellist = []
-        for i in range (0,r.shape[0]):
-            if r[i][0] >= L/2:
-                row = np.append(step,r[i])
-                row = np.append(row,vel[i]).T
-                Li_state_ary=np.concatenate((Li_state_ary,row),axis = 0)
-                dellist.append(i)
-                print("deleted")
-                print(i)
-        rnew = minimum_image(r, L)
-        rnew = np.delete(r,dellist,0)
-        velnew = np.delete(vel,dellist,0)
-    else:
-        rnew = r
-    return rnew, Li_state_ary, velnew
+    return F_ext
