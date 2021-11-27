@@ -126,11 +126,11 @@ class lattice:
     def init(self, numofcells,boxdim):
         """lattice parameters has format [x,y,z]"""
         """Unit of the lattice parameters: Angstrom"""
-        self.lattice_params = np.array([2.46772,2.46772, 8.68504])
+        self.lattice_params = np.array([4.32329,4.32329, 3.74537])
     
         """structure parameters has format [x,y,z]"""
         """structure parameters are formatted as ratios of lattice parameter"""
-        C_struct_param = np.array([[0.00,    0.00,    0.25 ],[0.0,    0.0,    0.75],[0.66667,    0.33333,    0.25 ],[0.33333,    0.66667,    0.75]])
+        C_struct_param = np.array([[0.00,    0.33355,    0.5 ],[0.66645,    0.66645,    0.5],[0.33355,    0.0,    0.5 ],[0.0,    0.66645,    0.5],[0.33355,    0.33355,    0.5],[0.66645,    0.0,    0.5]])
   
     
         """Atom Positions in unit cell in angstrom"""
@@ -155,10 +155,10 @@ class lattice:
             Unit Conversion: 1eV= 1.602*10**(-19) J
         """
     
-        c_properties_list = np.array([[1.9944*10**(-23),0, 0.105,3.851],[1.9944*10**(-23),0, 0.105,3.851],[1.9944*10**(-23),0, 0.105,3.851],[1.9944*10**(-23),0, 0.105,3.851]])
+        c_properties_list = np.array([[1.9944*10**(-23),0, 0.105,3.851],[1.9944*10**(-23),0, 0.105,3.851],[1.9944*10**(-23),0, 0.105,3.851],[1.9944*10**(-23),0, 0.105,3.851],[1.9944*10**(-23),0, 0.105,3.851],[1.9944*10**(-23),0, 0.105,3.851]])
         fixed_UC_prop = c_properties_list
         UC_ary = np.concatenate((fixed_UC_pos, fixed_UC_prop),axis = 1)
-        c_col = np.array([0.1,0.1,0.1,0.1])
+        c_col = np.array([0.1,0.1,0.1,0.1,0.1,0.1])
         fixed_UC_color = c_col
         adjustedlatticeparam = np.array([self.lattice_params[0]-self.lattice_params[1]*np.cos(np.pi/3),self.lattice_params[1]*np.sin(np.pi/3),self.lattice_params[2]])
         """real space dimension of lattice"""

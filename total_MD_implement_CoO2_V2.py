@@ -10,7 +10,7 @@ Created on Thu Nov 25 17:14:32 2021
 #implement MD Code
 import total_MD_code_V2 as F1
 #import Lattice_Graphite as coor
-import Lattice_CoO2 as coor
+import Lattice_Graphite_V2 as coor
 import numpy as np
 import matplotlib.pyplot as plt
 import time

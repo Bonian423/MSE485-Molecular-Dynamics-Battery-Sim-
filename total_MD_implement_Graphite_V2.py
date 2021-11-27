@@ -14,11 +14,10 @@ import Lattice_Graphite_V2 as coor
 import numpy as np
 import matplotlib.pyplot as plt
 import time
-
+import random 
 ##Initial Values
 #Coordinates
 initial_pos = coor.a 
-
 L = coor.dim
 T = 300
 cutoff = L/2
@@ -26,8 +25,8 @@ N = np.shape(initial_pos)[0]
 V = L**3
 alpha = (np.pi)*(N/(V**2))**(1/3)
 #
-steps = 100
-timestep =1e-12 
+steps = 10
+timestep =1e-11 
 #
 N_max = 4
 Karr = F1.my_legal_kvecs(N_max,L)
@@ -116,8 +115,17 @@ r_ = []
 
 veloci = []
 t0 = time.time()
+
+chanceofLi = 7/steps*1.25
+stepafter = steps*0.2
+
 for i in range(0,steps):
     print("step:"+str(i))
+    print("atoms:"+str(coordinates.shape[0]))
+    if i > stepafter:
+        if random.random()<chanceofLi:
+            coordinates = np.concatenate((coordinates, np.array([-2.95, random.random()*6-3, random.random()*6-3, 1.1526*10**(-23),1,0.305,2.051]).reshape(1,7)),axis = 0)
+            velocities = np.concatenate((velocities,np.array([0,0,0]).reshape(1,3)),axis =0)
     coordinates, velocities, displacements, distances = advance(coordinates,\
             velocities,timestep, displacements, distances, cutoff,\
             L,K_vecs,Efield)
@@ -137,14 +145,46 @@ for i in range(0,steps):
     G_r.append(F1.my_pair_correlation(F1.dist_ravel(distances),N,num_bins,dr_,L)[0])
     r_.append(F1.my_pair_correlation(F1.dist_ravel(distances),N,num_bins,dr_,L)[1])
     
+vacf_arr = np.array([])
+num_t = 0
+for i in range(len(veloci)):
+    add_vel = F1.my_calc_vacf0(veloci,i)
+    vacf_arr = np.append(vacf_arr,add_vel)
+    num_t=num_t+1
+
 t1 = time.time()
 print(t1-t0)
-    
+
+dim = L
+plt.figure(1)
+ax = plt.axes(projection='3d')
+ax.scatter3D(coordinates[:,0], coordinates[:,1], coordinates[:,2])
+ax.set_xlim3d(left=-dim/2, right=dim/2)
+ax.set_ylim3d(bottom=-dim/2, top=dim/2)
+ax.set_zlim3d(bottom=-dim/2, top=dim/2)
+ax.view_init(-180, 90)
+ax.set_xlabel("x")
+ax.set_ylabel("y")
+ax.set_zlabel("z")  
+
+plt.figure(2)
+ax = plt.axes(projection='3d')
+ax.scatter3D(coordinates[:,0], coordinates[:,1], coordinates[:,2])
+ax.set_xlim3d(left=-dim/2, right=dim/2)
+ax.set_ylim3d(bottom=-dim/2, top=dim/2)
+ax.set_zlim3d(bottom=-dim/2, top=dim/2)
+ax.view_init(90, 270)
+ax.set_xlabel("x")
+ax.set_ylabel("y")
+ax.set_zlabel("z")
 
 
-
-
-
+plt.figure(3)
+ax = plt.axes(projection='3d')
+ax.scatter3D(coordinates[:,0], coordinates[:,1], coordinates[:,2])
+ax.set_xlim3d(left=-dim/2, right=dim/2)
+ax.set_ylim3d(bottom=-dim/2, top=dim/2)
+ax.set_zlim3d(bottom=-dim/2, top=dim/2)
 
 
 
