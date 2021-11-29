@@ -34,7 +34,7 @@ Karr = F1.my_legal_kvecs(N_max,L)
 num_bins = 14
 dr_ = 0.25
 
-Voltage = 15
+Voltage = 45
 NC = Voltage/7/10**9
 Efield = np.array([NC,0,0])
 
