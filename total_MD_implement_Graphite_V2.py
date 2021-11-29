@@ -25,8 +25,8 @@ N = np.shape(initial_pos)[0]
 V = L**3
 alpha = (np.pi)*(N/(V**2))**(1/3)
 #
-steps = 10
-timestep =1e-11 
+steps = 100
+timestep = 1e-11 
 #
 N_max = 4
 Karr = F1.my_legal_kvecs(N_max,L)
@@ -34,7 +34,8 @@ Karr = F1.my_legal_kvecs(N_max,L)
 num_bins = 14
 dr_ = 0.25
 
-NC = 9/7/10**9
+Voltage = 15
+NC = Voltage/7/10**9
 Efield = np.array([NC,0,0])
 
 

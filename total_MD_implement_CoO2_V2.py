@@ -10,7 +10,7 @@ Created on Thu Nov 25 17:14:32 2021
 #implement MD Code
 import total_MD_code_V2 as F1
 #import Lattice_Graphite as coor
-import Lattice_Graphite_V2 as coor
+import Lattice_CoO2_V2 as coor
 import numpy as np
 import matplotlib.pyplot as plt
 import time
@@ -35,7 +35,8 @@ Karr = F1.my_legal_kvecs(N_max,L)
 num_bins = 14
 dr_ = 0.25
 
-NC = 9/7/10**9
+Voltage = 5
+NC = Voltage/7/10**9
 Efield = np.array([NC,0,0])
 
 
@@ -118,6 +119,7 @@ veloci = []
 t0 = time.time()
 for i in range(0,steps):
     print("step:"+str(i))
+    print("atoms:"+str(coordinates.shape[0]))
     coordinates, velocities, displacements, distances = advance(coordinates,\
             velocities,timestep, displacements, distances, cutoff,\
             L,K_vecs,Efield)
@@ -140,6 +142,46 @@ for i in range(0,steps):
 t1 = time.time()
 print(t1-t0)
     
+vacf_arr = np.array([])
+num_t = 0
+for i in range(len(veloci)):
+    add_vel = F1.my_calc_vacf0(veloci,i)
+    vacf_arr = np.append(vacf_arr,add_vel)
+    num_t=num_t+1
+
+t1 = time.time()
+print(t1-t0)
+
+dim = L
+plt.figure(1)
+ax = plt.axes(projection='3d')
+ax.scatter3D(coordinates[:,0], coordinates[:,1], coordinates[:,2])
+ax.set_xlim3d(left=-dim/2, right=dim/2)
+ax.set_ylim3d(bottom=-dim/2, top=dim/2)
+ax.set_zlim3d(bottom=-dim/2, top=dim/2)
+ax.view_init(-180, 90)
+ax.set_xlabel("x")
+ax.set_ylabel("y")
+ax.set_zlabel("z")  
+
+plt.figure(2)
+ax = plt.axes(projection='3d')
+ax.scatter3D(coordinates[:,0], coordinates[:,1], coordinates[:,2])
+ax.set_xlim3d(left=-dim/2, right=dim/2)
+ax.set_ylim3d(bottom=-dim/2, top=dim/2)
+ax.set_zlim3d(bottom=-dim/2, top=dim/2)
+ax.view_init(90, 270)
+ax.set_xlabel("x")
+ax.set_ylabel("y")
+ax.set_zlabel("z")
+
+
+plt.figure(3)
+ax = plt.axes(projection='3d')
+ax.scatter3D(coordinates[:,0], coordinates[:,1], coordinates[:,2])
+ax.set_xlim3d(left=-dim/2, right=dim/2)
+ax.set_ylim3d(bottom=-dim/2, top=dim/2)
+ax.set_zlim3d(bottom=-dim/2, top=dim/2)
 
 
 
