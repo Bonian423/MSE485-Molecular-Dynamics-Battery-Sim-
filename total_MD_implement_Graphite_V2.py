@@ -68,6 +68,10 @@ def advance(pos, vel, dt, disp, dist, rc, L,kvecs,E):
     #print(accel)
     #move
     vel_half = vel + 0.5*dt*accel
+    
+    #vel_half[:][0:3] = vel[:][0:3] + 0.5*dt*accel[:][0:3]
+    
+      
     for i in range(0,np.shape(vel_half)[0]):
         if pos[i][4] == 1:
             vel_half[i][0:3] = vel[i][0:3] + 0.5*dt*accel[i][0:3]
