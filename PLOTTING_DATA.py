@@ -63,7 +63,7 @@ plt.title('MD Temperature vs Time Step')
 plt.ylabel('Temperature (K)')
 plt.xlabel('Time Step (1e-12)') 
 
-plt.figure(5)
+plt.figure(6)
 plt.plot(np.arange(0,len(vacf_0)),vacf_0,'--bo',label = 'D='+str(np.round(F1.my_diffusion_constant(vacf_0),3)))
 plt.title('V-V autocorrelation function')
 plt.xlabel('Time Step (1e-12)') 
@@ -72,12 +72,30 @@ plt.legend()
        
         
         
+#Gr_avg = np.array([])
+#Sk_avg = np.array([])
+#for i in S_k:
+#    add_avgS = np.average(i)
+#    Sk_avg = np.append(Sk_avg,add_avgS)
+#for i in G_r:
+#    add_avgG = np.average(i)
+#    Gr_avg = np.append(Gr_avg,add_avgG)
+     
         
         
         
-        
-        
-        
+###
+import matplotlib.pyplot as plt
+import numpy as np
+for i in E:
+    if i > 0.1:
+        E.remove(i)
+plt.plot(np.arange(0,len(E)),E)  
+plt.title('Total Energy vs Time Step - T1')
+plt.ylabel('Energy (J)')
+plt.xlabel('Time Step (1e-12)')      
+plt.savefig('spydata/Trial1_E',dpi=500,bbox_inches = "tight") 
+#        
         
         
         
