@@ -29,11 +29,11 @@ Simulation calculation construction:
 
 
 Observables:  
-    Diffusion coefficient,
+    Diffusion coefficient
     Kinetic and Potential Energy
     Eward Energy
-    Charging temperature, 
-    Structure factor, 
+    Charging temperature
+    Structure factor 
     Velocity autocorrelation
 
 
